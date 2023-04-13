@@ -11,11 +11,15 @@ function Square({ value, onSquareClick }) {
 export default function Board() {
   const [xIsNext, setXIsNext] = useState(true);
   const [squares, setSquares] = useState(Array(9).fill(null));
-
+  const initialCount = 0;
+  const [count, setCount] = useState(initialCount);
+  
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares)) {
       return;
     }
+
+    setCount(prevCount => prevCount + 1);
     const nextSquares = squares.slice();
     if (xIsNext) {
       nextSquares[i] = "X";
@@ -26,16 +30,28 @@ export default function Board() {
     setXIsNext(!xIsNext);
   }
 
+  function restart() {
+    const tempSquares = squares.slice();
+    for (var i = 0; i < 9; ++i) {
+      tempSquares[i] = null;
+    }
+    setSquares(tempSquares);
+    setXIsNext(true);
+    setCount(0);
+  }
+
   const winner = calculateWinner(squares);
   let status;
   if (winner) {
     status = "Winner: " + winner;
+  }else if(count === 9){
+    status = "Draw";
   } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
   return (
-    <>
+    <div className="centered">
       <div className="status">{status}</div>
       <div className="board-row">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
@@ -52,7 +68,10 @@ export default function Board() {
         <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
         <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
       </div>
-    </>
+      <button onClick={restart} className="btn">
+        Restart
+      </button>
+    </div>
   );
 }
 
